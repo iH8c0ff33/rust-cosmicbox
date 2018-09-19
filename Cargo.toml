@@ -1,0 +1,7 @@
+[package]
+name = "cosmicbox"
+version = "0.0.1"
+authors = ["Daniele Monteleone <daniele.monteleone.it@gmail.com>"]
+
+[dependencies]
+hidapi = "0.5"
