@@ -20,3 +20,23 @@ impl CosmicBox<HidDevice> {
         Ok(data.to_vec())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use hidapi::HidApi;
+
+    use hid::packet::HidPacket;
+    use CosmicBox;
+
+    #[test]
+    fn cosmicbox_hid_send() {
+        let hid = HidApi::new().unwrap();
+        let cb = CosmicBox::connect(hid);
+
+        assert!(
+            cb.send(HidPacket::write_8(12, !0b000 & 0b111, 0b000))
+                .is_ok()
+        );
+        println!("end");
+    }
+}
