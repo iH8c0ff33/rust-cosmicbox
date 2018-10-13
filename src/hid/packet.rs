@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct HidPacket {
     major_cmd: u8,
     minor_cmd: u8,
