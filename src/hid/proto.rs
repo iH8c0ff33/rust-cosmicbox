@@ -37,6 +37,21 @@ mod tests {
             cb.send(HidPacket::write_8(12, !0b000 & 0b111, 0b000))
                 .is_ok()
         );
-        println!("end");
+    }
+
+    #[test]
+    fn cosmicbox_hid_read8() {
+        let hid = HidApi::new().unwrap();
+        let cb = CosmicBox::connect(hid);
+
+        assert!(cb.read_8(100).is_ok());
+    }
+
+    #[test]
+    fn cosmicbox_hid_read16() {
+        let hid = HidApi::new().unwrap();
+        let cb = CosmicBox::connect(hid);
+
+        assert!(cb.read_8(104).is_ok());
     }
 }

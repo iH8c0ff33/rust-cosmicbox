@@ -5,6 +5,7 @@ pub mod hid;
 pub const VENDOR_ID: u16 = 0x0fc5;
 pub const PRODUCT_ID: u16 = 0xb080;
 
+#[derive(Debug, PartialEq)]
 pub struct TriggerOptions {
     top: bool,
     bottom: bool,
