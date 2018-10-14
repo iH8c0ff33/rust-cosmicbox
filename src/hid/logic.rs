@@ -8,11 +8,11 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
         Self { device }
     }
 
-    fn set_trigger(&self, options: TriggerOptions) {
+    fn set_trigger(&self, options: &TriggerOptions) {
         let packet = HidPacket::write_8(
             12,
-            !((options.top as u8) << 7 | (options.bottom as u8) << 6 | (options.ext as u8) << 5),
-            0b1110000,
+            !((options.top as u8) << 2 | (options.bottom as u8) << 1 | (options.ext as u8)) << 5,
+            (options.top as u8) << 7 | (options.bottom as u8) << 6 | (options.ext as u8) << 5,
         );
 
         self.send(packet).expect("couldn't send packet")
@@ -22,9 +22,9 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
         let ports = self.read_8(100).expect("couldn't read packet");
 
         TriggerOptions {
-            top: (ports[2] & 0b1) != 0,
-            bottom: (ports[2] & 0b10) != 0,
-            ext: (ports[2] & 0b100) != 0,
+            top: (ports[1] & (1 << 7)) != 0,
+            bottom: (ports[1] & (1<<6)) != 0,
+            ext: (ports[1] & (1<<5)) != 0,
         }
     }
 

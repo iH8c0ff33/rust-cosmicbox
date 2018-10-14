@@ -25,7 +25,7 @@ pub enum Counter {
 
 pub trait GenericCosmicBox<T> {
     fn new(T) -> Self;
-    fn set_trigger(&self, options: TriggerOptions);
+    fn set_trigger(&self, options: &TriggerOptions);
     fn get_trigger(&self) -> TriggerOptions;
     fn reset(&self);
     fn get_count(&self, Counter) -> u16;
