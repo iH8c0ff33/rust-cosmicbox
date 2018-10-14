@@ -98,4 +98,28 @@ mod tests {
 
         let _ = CosmicBox::new(device);
     }
+
+    #[test]
+    fn cosmicbox_hid_set_get_trigger() {
+        let hid = HidApi::new().unwrap();
+        let cb = CosmicBox::connect(hid);
+
+        let options = TriggerOptions {
+            top: true,
+            bottom: true,
+            ext: false,
+        };
+
+        cb.set_trigger(&options);
+
+        assert_eq!(cb.get_trigger(), options);
+    }
+
+    #[test]
+    fn cosmicbox_hid_reset() {
+        let hid = HidApi::new().unwrap();
+        let cb = CosmicBox::connect(hid);
+
+        cb.reset();
+    }
 }
