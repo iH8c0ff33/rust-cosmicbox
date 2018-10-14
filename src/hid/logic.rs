@@ -1,3 +1,6 @@
+use std::thread;
+use std::time::Duration;
+
 use hidapi::HidDevice;
 
 use hid::packet::HidPacket;
@@ -23,14 +26,15 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
 
         TriggerOptions {
             top: (ports[1] & (1 << 7)) != 0,
-            bottom: (ports[1] & (1<<6)) != 0,
-            ext: (ports[1] & (1<<5)) != 0,
+            bottom: (ports[1] & (1 << 6)) != 0,
+            ext: (ports[1] & (1 << 5)) != 0,
         }
     }
 
     fn reset(&self) {
         self.send(HidPacket::write_8(12, 1 << 4, 0))
             .expect("couldn't send packet");
+        thread::sleep(Duration::from_millis(1));
         self.send(HidPacket::write_8(12, 0, 1 << 4))
             .expect("couldn't send packet");
     }
@@ -40,41 +44,41 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
             Counter::Top => {
                 self.send(HidPacket::write_8(12, !0b000 & 0b111, 0b111))
                     .unwrap();
-                let lsb: u16 = self.read_8(100).unwrap()[1].into();
+                let lsb: u16 = self.read_8(100).unwrap()[0].into();
 
                 self.send(HidPacket::write_8(12, !0b001 & 0b111, 0b111))
                     .unwrap();
-                let msb: u16 = self.read_8(100).unwrap()[1].into();
+                let msb: u16 = self.read_8(100).unwrap()[0].into();
                 lsb | msb << 8
             }
             Counter::Bottom => {
                 self.send(HidPacket::write_8(12, !0b010 & 0b111, 0b111))
                     .unwrap();
-                let lsb: u16 = self.read_8(100).unwrap()[1].into();
+                let lsb: u16 = self.read_8(100).unwrap()[0].into();
 
                 self.send(HidPacket::write_8(12, !0b011 & 0b111, 0b111))
                     .unwrap();
-                let msb: u16 = self.read_8(100).unwrap()[1].into();
+                let msb: u16 = self.read_8(100).unwrap()[0].into();
                 lsb | msb << 8
             }
             Counter::Ext => {
                 self.send(HidPacket::write_8(12, !0b100 & 0b111, 0b111))
                     .unwrap();
-                let lsb: u16 = self.read_8(100).unwrap()[1].into();
+                let lsb: u16 = self.read_8(100).unwrap()[0].into();
 
                 self.send(HidPacket::write_8(12, !0b101 & 0b111, 0b111))
                     .unwrap();
-                let msb: u16 = self.read_8(100).unwrap()[1].into();
+                let msb: u16 = self.read_8(100).unwrap()[0].into();
                 lsb | msb << 8
             }
             Counter::Coinc => {
                 self.send(HidPacket::write_8(12, !0b110 & 0b111, 0b111))
                     .unwrap();
-                let lsb: u16 = self.read_8(100).unwrap()[1].into();
+                let lsb: u16 = self.read_8(100).unwrap()[0].into();
 
                 self.send(HidPacket::write_8(12, !0b111 & 0b111, 0b111))
                     .unwrap();
-                let msb: u16 = self.read_8(100).unwrap()[1].into();
+                let msb: u16 = self.read_8(100).unwrap()[0].into();
                 lsb | msb << 8
             }
         }
