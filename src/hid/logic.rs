@@ -126,4 +126,19 @@ mod tests {
 
         cb.reset();
     }
+
+    #[test]
+    fn cosmicbox_get_count() {
+        let hid = HidApi::new().unwrap();
+        let cb = CosmicBox::connect(hid);
+
+        cb.set_trigger(&TriggerOptions {
+            top: false,
+            bottom: false,
+            ext: false,
+        });
+        cb.reset();
+
+        assert_eq!(cb.get_count(Counter::Coinc), 0);
+    }
 }
