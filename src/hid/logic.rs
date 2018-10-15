@@ -39,47 +39,44 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
             .expect("couldn't send packet");
     }
 
+    fn set_address(&self, address: u8) {
+        self.send(HidPacket::write_8(12, !address & 0b111, 0b111))
+            .expect("couldn't set address")
+    }
+
     fn get_count(&self, counter: Counter) -> u16 {
         match counter {
             Counter::Top => {
-                self.send(HidPacket::write_8(12, !0b000 & 0b111, 0b111))
-                    .unwrap();
-                let lsb: u16 = self.read_8(100).unwrap()[0].into();
+                self.set_address(0b000);
+                let lsb = self.read_8(100).unwrap()[0];
 
-                self.send(HidPacket::write_8(12, !0b001 & 0b111, 0b111))
-                    .unwrap();
-                let msb: u16 = self.read_8(100).unwrap()[0].into();
-                lsb | msb << 8
+                self.set_address(0b001);
+                let msb = self.read_8(100).unwrap()[0];
+                (msb as u16) << 8 | lsb as u16
             }
             Counter::Bottom => {
-                self.send(HidPacket::write_8(12, !0b010 & 0b111, 0b111))
-                    .unwrap();
-                let lsb: u16 = self.read_8(100).unwrap()[0].into();
+                self.set_address(0b010);
+                let lsb = self.read_8(100).unwrap()[0];
 
-                self.send(HidPacket::write_8(12, !0b011 & 0b111, 0b111))
-                    .unwrap();
-                let msb: u16 = self.read_8(100).unwrap()[0].into();
-                lsb | msb << 8
+                self.set_address(0b011);
+                let msb = self.read_8(100).unwrap()[0];
+                (msb as u16) << 8 | lsb as u16
             }
             Counter::Ext => {
-                self.send(HidPacket::write_8(12, !0b100 & 0b111, 0b111))
-                    .unwrap();
-                let lsb: u16 = self.read_8(100).unwrap()[0].into();
+                self.set_address(0b100);
+                let lsb = self.read_8(100).unwrap()[0];
 
-                self.send(HidPacket::write_8(12, !0b101 & 0b111, 0b111))
-                    .unwrap();
-                let msb: u16 = self.read_8(100).unwrap()[0].into();
-                lsb | msb << 8
+                self.set_address(0b101);
+                let msb = self.read_8(100).unwrap()[0];
+                (msb as u16) << 8 | lsb as u16
             }
             Counter::Coinc => {
-                self.send(HidPacket::write_8(12, !0b110 & 0b111, 0b111))
-                    .unwrap();
-                let lsb: u16 = self.read_8(100).unwrap()[0].into();
+                self.set_address(0b110);
+                let lsb = self.read_8(100).unwrap()[0];
 
-                self.send(HidPacket::write_8(12, !0b111 & 0b111, 0b111))
-                    .unwrap();
-                let msb: u16 = self.read_8(100).unwrap()[0].into();
-                lsb | msb << 8
+                self.set_address(0b111);
+                let msb = self.read_8(100).unwrap()[0];
+                (msb as u16) << 8 | lsb as u16
             }
         }
     }

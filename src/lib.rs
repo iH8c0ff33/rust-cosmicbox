@@ -28,6 +28,7 @@ pub trait GenericCosmicBox<T> {
     fn set_trigger(&self, options: &TriggerOptions);
     fn get_trigger(&self) -> TriggerOptions;
     fn reset(&self);
+    fn set_address(&self, u8);
     fn get_count(&self, Counter) -> u16;
 }
 
