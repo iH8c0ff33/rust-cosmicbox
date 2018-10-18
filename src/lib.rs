@@ -7,9 +7,9 @@ pub const PRODUCT_ID: u16 = 0xb080;
 
 #[derive(Debug, PartialEq)]
 pub struct TriggerOptions {
-    top: bool,
-    bottom: bool,
-    ext: bool,
+    pub top: bool,
+    pub bottom: bool,
+    pub ext: bool,
 }
 
 pub struct CosmicBox<T> {
