@@ -41,7 +41,7 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
     }
 
     fn set_address(&self, address: u8) {
-        self.send(HidPacket::write_8(12, !address & 0b111, 0b111))
+        self.send(HidPacket::write_8(12, !address & 0b111, address))
             .expect("couldn't set address")
     }
 

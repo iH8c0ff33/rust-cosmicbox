@@ -1,6 +1,6 @@
 [package]
 name = "cosmicbox"
-version = "0.2.1"
+version = "0.3.1"
 authors = ["Daniele Monteleone <daniele.monteleone.it@gmail.com>"]
 
 [dependencies]
