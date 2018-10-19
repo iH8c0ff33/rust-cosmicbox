@@ -5,7 +5,7 @@ use hidapi::HidDevice;
 
 use error::CosmicboxResult;
 use hid::packet::HidPacket;
-use {CosmicBox, Counter, GenericCosmicBox, TriggerOptions};
+use {CosmicBox, Counters, GenericCosmicBox, TriggerOptions};
 
 impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
     fn new(device: HidDevice) -> Self {
@@ -45,41 +45,43 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
             .expect("couldn't set address")
     }
 
-    fn get_count(&self, counter: Counter) -> CosmicboxResult<u16> {
-        match counter {
-            Counter::Top => {
-                self.set_address(0b000);
-                let lsb = self.read_8(100)?[0];
+    fn get_counters(&self) -> CosmicboxResult<Counters> {
+        let mut counters = Counters {
+            top: 0,
+            bottom: 0,
+            ext: 0,
+            coinc: 0,
+        };
 
-                self.set_address(0b001);
-                let msb = self.read_8(100)?[0];
-                Ok((msb as u16) << 8 | lsb as u16)
-            }
-            Counter::Bottom => {
-                self.set_address(0b010);
-                let lsb = self.read_8(100)?[0];
+        self.set_address(0b000);
+        let lsb = self.read_8(100)?[0];
 
-                self.set_address(0b011);
-                let msb = self.read_8(100)?[0];
-                Ok((msb as u16) << 8 | lsb as u16)
-            }
-            Counter::Ext => {
-                self.set_address(0b100);
-                let lsb = self.read_8(100)?[0];
+        self.set_address(0b001);
+        let msb = self.read_8(100)?[0];
+        counters.top = (msb as u16) << 8 | lsb as u16;
 
-                self.set_address(0b101);
-                let msb = self.read_8(100)?[0];
-                Ok((msb as u16) << 8 | lsb as u16)
-            }
-            Counter::Coinc => {
-                self.set_address(0b110);
-                let lsb = self.read_8(100)?[0];
+        self.set_address(0b010);
+        let lsb = self.read_8(100)?[0];
 
-                self.set_address(0b111);
-                let msb = self.read_8(100)?[0];
-                Ok((msb as u16) << 8 | lsb as u16)
-            }
-        }
+        self.set_address(0b011);
+        let msb = self.read_8(100)?[0];
+        counters.bottom = (msb as u16) << 8 | lsb as u16;
+
+        self.set_address(0b100);
+        let lsb = self.read_8(100)?[0];
+
+        self.set_address(0b101);
+        let msb = self.read_8(100)?[0];
+        counters.ext = (msb as u16) << 8 | lsb as u16;
+
+        self.set_address(0b110);
+        let lsb = self.read_8(100)?[0];
+
+        self.set_address(0b111);
+        let msb = self.read_8(100)?[0];
+        counters.coinc = (msb as u16) << 8 | lsb as u16;
+
+        Ok(counters)
     }
 }
 
@@ -137,8 +139,8 @@ mod tests {
         });
         cb.reset();
 
-        assert!(cb.get_count(Counter::Coinc).is_ok());
+        assert!(cb.get_counters().is_ok());
 
-        assert_eq!(cb.get_count(Counter::Coinc).unwrap(), 0);
+        assert_eq!(cb.get_counters().unwrap().coinc, 0);
     }
 }

@@ -19,11 +19,11 @@ pub struct CosmicBox<T> {
     device: T,
 }
 
-pub enum Counter {
-    Top,
-    Bottom,
-    Ext,
-    Coinc,
+pub struct Counters {
+    pub top: u16,
+    pub bottom: u16,
+    pub ext: u16,
+    pub coinc: u16
 }
 
 pub trait GenericCosmicBox<T> {
@@ -32,7 +32,7 @@ pub trait GenericCosmicBox<T> {
     fn get_trigger(&self) -> TriggerOptions;
     fn reset(&self);
     fn set_address(&self, u8);
-    fn get_count(&self, Counter) -> CosmicboxResult<u16>;
+    fn get_counters(&self) -> CosmicboxResult<Counters>;
 }
 
 #[cfg(test)]
