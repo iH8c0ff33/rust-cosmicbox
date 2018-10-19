@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use hidapi::HidDevice;
 
+use error::CosmicboxResult;
 use hid::packet::HidPacket;
 use {CosmicBox, Counter, GenericCosmicBox, TriggerOptions};
 
@@ -44,39 +45,39 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
             .expect("couldn't set address")
     }
 
-    fn get_count(&self, counter: Counter) -> u16 {
+    fn get_count(&self, counter: Counter) -> CosmicboxResult<u16> {
         match counter {
             Counter::Top => {
                 self.set_address(0b000);
-                let lsb = self.read_8(100).unwrap()[0];
+                let lsb = self.read_8(100)?[0];
 
                 self.set_address(0b001);
-                let msb = self.read_8(100).unwrap()[0];
-                (msb as u16) << 8 | lsb as u16
+                let msb = self.read_8(100)?[0];
+                Ok((msb as u16) << 8 | lsb as u16)
             }
             Counter::Bottom => {
                 self.set_address(0b010);
-                let lsb = self.read_8(100).unwrap()[0];
+                let lsb = self.read_8(100)?[0];
 
                 self.set_address(0b011);
-                let msb = self.read_8(100).unwrap()[0];
-                (msb as u16) << 8 | lsb as u16
+                let msb = self.read_8(100)?[0];
+                Ok((msb as u16) << 8 | lsb as u16)
             }
             Counter::Ext => {
                 self.set_address(0b100);
-                let lsb = self.read_8(100).unwrap()[0];
+                let lsb = self.read_8(100)?[0];
 
                 self.set_address(0b101);
-                let msb = self.read_8(100).unwrap()[0];
-                (msb as u16) << 8 | lsb as u16
+                let msb = self.read_8(100)?[0];
+                Ok((msb as u16) << 8 | lsb as u16)
             }
             Counter::Coinc => {
                 self.set_address(0b110);
-                let lsb = self.read_8(100).unwrap()[0];
+                let lsb = self.read_8(100)?[0];
 
                 self.set_address(0b111);
-                let msb = self.read_8(100).unwrap()[0];
-                (msb as u16) << 8 | lsb as u16
+                let msb = self.read_8(100)?[0];
+                Ok((msb as u16) << 8 | lsb as u16)
             }
         }
     }
@@ -136,6 +137,8 @@ mod tests {
         });
         cb.reset();
 
-        assert_eq!(cb.get_count(Counter::Coinc), 0);
+        assert!(cb.get_count(Counter::Coinc).is_ok());
+
+        assert_eq!(cb.get_count(Counter::Coinc).unwrap(), 0);
     }
 }

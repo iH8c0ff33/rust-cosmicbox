@@ -1,5 +1,8 @@
 extern crate hidapi;
 
+use error::CosmicboxResult;
+
+pub mod error;
 pub mod hid;
 
 pub const VENDOR_ID: u16 = 0x0fc5;
@@ -29,7 +32,7 @@ pub trait GenericCosmicBox<T> {
     fn get_trigger(&self) -> TriggerOptions;
     fn reset(&self);
     fn set_address(&self, u8);
-    fn get_count(&self, Counter) -> u16;
+    fn get_count(&self, Counter) -> CosmicboxResult<u16>;
 }
 
 #[cfg(test)]
