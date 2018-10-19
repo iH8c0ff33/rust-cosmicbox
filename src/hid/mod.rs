@@ -9,7 +9,7 @@ pub mod proto;
 impl CosmicBox<HidDevice> {
     pub fn connect(hid: HidApi) -> Self {
         Self {
-            device: hid.open(VENDOR_ID, PRODUCT_ID).unwrap(),
+            device: hid.open(VENDOR_ID, PRODUCT_ID).expect("couldn't connect to cosmicbox"),
         }
     }
 }
