@@ -1,6 +1,6 @@
 use hidapi::{HidDevice, HidResult};
 
-use error::{CosmicboxError, CosmicboxResult};
+use error::{CosmicboxError, CosmicBoxResult};
 use hid::packet::HidPacket;
 use CosmicBox;
 
@@ -9,7 +9,7 @@ impl CosmicBox<HidDevice> {
         self.device.send_feature_report(&<Vec<u8>>::from(packet))
     }
 
-    pub fn read_8(&self, report: u8) -> CosmicboxResult<Vec<u8>> {
+    pub fn read_8(&self, report: u8) -> CosmicBoxResult<Vec<u8>> {
         let mut data = [report; 8];
         self.device.get_feature_report(&mut data)?;
 

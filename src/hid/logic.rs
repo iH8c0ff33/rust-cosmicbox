@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use hidapi::HidDevice;
 
-use error::CosmicboxResult;
+use error::CosmicBoxResult;
 use hid::packet::HidPacket;
 use {CosmicBox, Counters, GenericCosmicBox, TriggerOptions};
 
@@ -12,40 +12,41 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
         Self { device }
     }
 
-    fn set_trigger(&self, options: &TriggerOptions) {
+    fn set_trigger(&self, options: &TriggerOptions) -> CosmicBoxResult<()> {
         let packet = HidPacket::write_8(
             12,
             !((options.top as u8) << 2 | (options.bottom as u8) << 1 | (options.ext as u8)) << 5,
             (options.top as u8) << 7 | (options.bottom as u8) << 6 | (options.ext as u8) << 5,
         );
 
-        self.send(packet).expect("couldn't send packet")
+        Ok(self.send(packet)?)
     }
 
-    fn get_trigger(&self) -> TriggerOptions {
-        let ports = self.read_8(100).expect("couldn't read packet");
+    fn get_trigger(&self) -> CosmicBoxResult<TriggerOptions> {
+        let ports = self.read_8(100)?;
 
-        TriggerOptions {
+        Ok(TriggerOptions {
             top: (ports[1] & (1 << 7)) != 0,
             bottom: (ports[1] & (1 << 6)) != 0,
             ext: (ports[1] & (1 << 5)) != 0,
-        }
+        })
     }
 
-    fn reset(&self) {
-        self.send(HidPacket::write_8(12, 1 << 4, 0))
-            .expect("couldn't send packet");
+    fn reset(&self) -> CosmicBoxResult<()> {
+        self.send(HidPacket::write_8(12, 1 << 4, 0))?;
         thread::sleep(Duration::from_millis(1));
-        self.send(HidPacket::write_8(12, 0, 1 << 4))
-            .expect("couldn't send packet");
+        self.send(HidPacket::write_8(12, 0, 1 << 4))?;
+
+        Ok(())
     }
 
-    fn set_address(&self, address: u8) {
-        self.send(HidPacket::write_8(12, !address & 0b111, address))
-            .expect("couldn't set address")
+    fn set_address(&self, address: u8) -> CosmicBoxResult<()>{
+        self.send(HidPacket::write_8(12, !address & 0b111, address))?;
+
+        Ok(())
     }
 
-    fn get_counters(&self) -> CosmicboxResult<Counters> {
+    fn get_counters(&self) -> CosmicBoxResult<Counters> {
         let mut counters = Counters {
             top: 0,
             bottom: 0,
@@ -53,31 +54,31 @@ impl GenericCosmicBox<HidDevice> for CosmicBox<HidDevice> {
             coinc: 0,
         };
 
-        self.set_address(0b000);
+        self.set_address(0b000)?;
         let lsb = self.read_8(100)?[0];
 
-        self.set_address(0b001);
+        self.set_address(0b001)?;
         let msb = self.read_8(100)?[0];
         counters.top = (msb as u16) << 8 | lsb as u16;
 
-        self.set_address(0b010);
+        self.set_address(0b010)?;
         let lsb = self.read_8(100)?[0];
 
-        self.set_address(0b011);
+        self.set_address(0b011)?;
         let msb = self.read_8(100)?[0];
         counters.bottom = (msb as u16) << 8 | lsb as u16;
 
-        self.set_address(0b100);
+        self.set_address(0b100)?;
         let lsb = self.read_8(100)?[0];
 
-        self.set_address(0b101);
+        self.set_address(0b101)?;
         let msb = self.read_8(100)?[0];
         counters.ext = (msb as u16) << 8 | lsb as u16;
 
-        self.set_address(0b110);
+        self.set_address(0b110)?;
         let lsb = self.read_8(100)?[0];
 
-        self.set_address(0b111);
+        self.set_address(0b111)?;
         let msb = self.read_8(100)?[0];
         counters.coinc = (msb as u16) << 8 | lsb as u16;
 
@@ -114,21 +115,22 @@ mod tests {
             ext: false,
         };
 
-        cb.set_trigger(&options);
+        assert!(cb.set_trigger(&options).is_ok());
 
-        assert_eq!(cb.get_trigger(), options);
+        assert_eq!(cb.get_trigger().unwrap(), options);
     }
 
+    // TODO: Check that this actually resets the counters
     #[test]
     fn cosmicbox_hid_reset() {
         let hid = HidApi::new().unwrap();
         let cb = CosmicBox::connect(hid);
 
-        cb.reset();
+        assert!(cb.reset().is_ok());
     }
 
     #[test]
-    fn cosmicbox_get_count() {
+    fn cosmicbox_get_counters() {
         let hid = HidApi::new().unwrap();
         let cb = CosmicBox::connect(hid);
 
@@ -136,8 +138,8 @@ mod tests {
             top: false,
             bottom: false,
             ext: false,
-        });
-        cb.reset();
+        }).unwrap();
+        cb.reset().unwrap();
 
         assert!(cb.get_counters().is_ok());
 

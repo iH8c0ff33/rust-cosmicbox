@@ -1,6 +1,6 @@
 extern crate hidapi;
 
-use error::CosmicboxResult;
+use error::CosmicBoxResult;
 
 pub mod error;
 pub mod hid;
@@ -28,11 +28,11 @@ pub struct Counters {
 
 pub trait GenericCosmicBox<T> {
     fn new(T) -> Self;
-    fn set_trigger(&self, options: &TriggerOptions);
-    fn get_trigger(&self) -> TriggerOptions;
-    fn reset(&self);
-    fn set_address(&self, u8);
-    fn get_counters(&self) -> CosmicboxResult<Counters>;
+    fn set_trigger(&self, options: &TriggerOptions) -> CosmicBoxResult<()>;
+    fn get_trigger(&self) -> CosmicBoxResult<TriggerOptions>;
+    fn reset(&self) -> CosmicBoxResult<()>;
+    fn set_address(&self, u8) -> CosmicBoxResult<()>;
+    fn get_counters(&self) -> CosmicBoxResult<Counters>;
 }
 
 #[cfg(test)]

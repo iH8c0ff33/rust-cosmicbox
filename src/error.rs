@@ -1,6 +1,6 @@
 use hidapi::HidError;
 
-pub type CosmicboxResult<T> = Result<T, CosmicboxError>;
+pub type CosmicBoxResult<T> = Result<T, CosmicboxError>;
 
 #[derive(Debug)]
 pub enum CosmicboxError {
@@ -10,7 +10,7 @@ pub enum CosmicboxError {
 impl From<HidError> for CosmicboxError {
     fn from(error: HidError) -> CosmicboxError {
         match error {
-            _ => CosmicboxError::ProtocolError("default"),
+            _ => CosmicboxError::ProtocolError("generic protocol error"),
         }
     }
 }

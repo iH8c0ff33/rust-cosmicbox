@@ -7,7 +7,7 @@ use hidapi::HidApi;
 fn main() {
     let hid = HidApi::new().unwrap();
     let cb = CosmicBox::connect(hid);
-    cb.reset();
+    cb.reset().expect("couldn't reset cosmicbox");
 
     println!("Cosmic Box reset done");
 }
