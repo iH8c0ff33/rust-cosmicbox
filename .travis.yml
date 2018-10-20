@@ -1,8 +1,15 @@
 language: rust
+sudo: false
+cache: cargo
 rust:
   - stable
   - beta
   - nightly
+
+env:
+  global:
+    - secure: cW/5edjTPgjmdVNx5O5Ngst1DPwA0KlVYk/Vt0pc0bBS+B+kKqiMKeItW/3VCvQDbRgalIh35g/TgPqRbGJtkvZxUBSv3PFBxHcNuNfzZ356l4DygJXQJDqkeHNdJXNTo9ThCRqqRYJtLXbsfM42gtMv1TH6SP0MpwHjcwjybmjtW6P30pE2wHO1vyq7g25QBLIVli1bHFuTxvD7rBPrr36lBUd0ZQMzbxQuJaFHJn/7mVtfC5dsdL0zxDeTUO97/t5WfrnnRX0uWctZicBzwCPcYcLHcBqkngSZbG8rmbNpAWWqHVYj1T/alV5d8u7crwDimDR5bgRd5sMi0RQRxtVFkELzTDBEUSwCPOC34o7Jr7tkujnGgy0oBMh26FCI0L9EyZi46eh37URSGThP5BtM2+832hu/+4zH+KxPHyUne5qqb6sth9Li69+B74nVzroI23ZMkwGyOG7UWmIXURZd08iricL/bLrFeYv95fSklHY0AJS0/pWnHVChQbYF32cDnQaaeCrA75cCvU1oIRh+7/C6VHMaJnLvnOipkFRAS8KYdVJVlyIVv6g8tYtWTExq4LRZ3vWsl1ACWGNIUoTYrmxepkGCWSq7z6rmzA90dCIiwQWCJsAXka1/IV4nCLi5qS+rb3Rj8CujMJjigxatqLr+fuGR8UwdlkXsJyY=
+
 script:
   - cargo build --verbose
 
@@ -11,9 +18,21 @@ matrix:
     - rust: nightly
   fast_finish: true
 
-cache: cargo
-
 addons:
   apt:
     packages:
       - libusb-1.0-0-dev
+
+deploy:
+  provider: releases
+  api_key:
+    secure: v9N8Je94d7/m2RFmhC8u6OWQX3Nv5FtQCrDFer5aHGM+MeqfVl3pMoslF59BJTovHwR4ALk8rbShFU2hUuHTp0vV3IbUwOn4x050dFddalVnQ3vD5k8alWt3eQ6tOkNNVcD+493WBsdFAkmu0xbQSwtCtTn49OPD2S+v/m4w8+voaQ8Nv1q8ffr2QXUA2HxAA3z852CLJ7HQ7tti/rKiTca6Zh2HWVZxE40MrDdkMx9hxvMzEyzctWTCqFfN4Zf/FhKXd7o0RLpIB5XL049FLnrGoV/iBH1GjCiIMW+ABScQhIH68c7UGvNPxLXH2fO3O3gGfBNkDuumaJWLaK6t6J0+Ejo1p3O9M60SftzlramSUHyAJ1gEvPEo3kA7aqgj32alP+3H/1NeYsb3Dza6xp+gVqh2nbdP3Uji584p12dBD0wjOGXQO/HsNTnidlAOsgPK7jaNKgSQ61v/xD2MHXiCQoudZube2v7OGRORJeoh8fTOBG8XuYe0WeyWB4ldA3U21Ws+9DkKahYdi5zlFsoLWFm1o134u2y4PEBq+mYBgFIw20vCl8vBSkEt4M7/FBTFUkS7y0G8ntN71vzZKPT0iTfuLLCw3ZZWy9karzToJQctmAH7PmxePV3U3t1GMHapyo8ldsN42+6Fwb9ABWOsHuginTHuV7tNjMbf9bg=
+  file: target/package/cosmicbox-$TRAVIS_TAG.crate
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
+    condition: "$TRAVIS_RUST_VERSION = stable"
+
+after_deploy:
+  - cargo publish --token ${CRATES_IO_TOKEN}
