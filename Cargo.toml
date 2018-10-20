@@ -3,6 +3,7 @@ name = "cosmicbox"
 version = "0.5.0"
 authors = ["Daniele Monteleone <daniele.monteleone.it@gmail.com>"]
 license = "MIT"
+description = "Rust library to interface with Cosmic Boxes using HID protocol"
 
 [dependencies]
 hidapi = "0.5"
